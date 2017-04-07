@@ -1,5 +1,13 @@
 import { DEFAULT_SRC } from '../constants';
 
+const warnOnInvalidPath = error => {
+  if (error.message.toLowerCase().indexOf('invalid path') !== -1) {
+    console.warn(error.message);
+  } else {
+    throw error;
+  }
+}
+
 export default {
   properties: {
     /**
@@ -63,7 +71,8 @@ export default {
    */
   _initPath(path) {
     Simpla.get(path)
-      .then(item => this._setPropsFromSimpla(item));
+      .then(item => this._setPropsFromSimpla(item))
+      .catch(warnOnInvalidPath);
 
     this._observeBuffer(path);
   },
@@ -76,17 +85,17 @@ export default {
    * @return {Promise}      Promise which resolves once successfully set to Simpla
    */
   _setData(src, alt, path) {
+    let type = 'Image',
+        data;
+
     if (this.__comingFromSimpla || src === DEFAULT_SRC) {
       return;
     }
 
-    return Simpla.set(path, {
-      type: 'Image',
-      data: {
-        src: this.src,
-        alt: this.alt
-      }
-    });
+    data = { src: this.src, alt: this.alt };
+
+    return Simpla.set(path, { type, data })
+      .catch(warnOnInvalidPath);
   },
 
   /**
@@ -105,7 +114,11 @@ export default {
       observers.buffer.unobserve();
     }
 
-    observers.buffer = Simpla.observe(path, (item) => this._setPropsFromSimpla(item));
+    try {
+      observers.buffer = Simpla.observe(path, (item) => this._setPropsFromSimpla(item));
+    } catch (error) {
+      warnOnInvalidPath(error);
+    }
   },
 
   /**

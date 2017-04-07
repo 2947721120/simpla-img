@@ -8,7 +8,8 @@
   <body>
     <script>
       let suites = [
-        'unit/index.html'
+        'unit/index.html',
+        'integration/index.html'
       ];
 
       WCT.loadSuites([ ...suites, ...suites.map(suite => `${suite}?dom=shady`) ]);

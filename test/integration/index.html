@@ -19,6 +19,11 @@
         <img is="simpla-img" editable />
       </template>
     </test-fixture>
+    <test-fixture id="simpla-connector">
+      <template>
+        <img is="simpla-img" />
+      </template>
+    </test-fixture>
     <script>
       describe('simpla-img', () => {
         describe('editable prop', () => {
@@ -26,6 +31,26 @@
             let image = fixture('editable');
 
             expect(image.editable).to.be.true;
+          });
+        });
+
+        describe('simpla connector', () => {
+          let image;
+          beforeEach(() => {
+            image = fixture('simpla-connector');
+          });
+
+          afterEach(() => {
+            Simpla.set.restore && Simpla.set.restore();
+            Simpla.get.restore && Simpla.get.restore();
+            Simpla.observe.restore && Simpla.observe.restore();
+          });
+
+          it('should not throw if path is set to invalid type', () => {
+            let setBadPath = () => image.path = 'bad path',
+                setGoodPath = () => image.path = '/good/path';
+
+            expect(setBadPath).not.to.throw();
           });
         });
       });
